@@ -2,10 +2,14 @@ const express = require('express')
 const cors = require('cors')
 const userRoutes = require('./routes/userRoutes')
 const productRoutes = require('./routes/productRoutes')
+const authRoutes = require('./routes/authRoutes')
 const sampleMiddleware = require('./middlewares/sampleMiddleware')
+const {verifyToken} = require('./middlewares/authMiddleware')
+const dotenv = require('dotenv');
+dotenv.config();
 const db = require('./config/mongodb');
 const app = express()
-const port = 8000
+const port = process.env.PORT || 8000
 
 // this middleware will help me parse the data coming in request obj
 app.use(express.json());
@@ -14,8 +18,9 @@ app.use(sampleMiddleware);
 // 2 different types of routes....
 // i. users routes
 // ii. products routes
-app.use('/users', userRoutes);
-app.use('/products', productRoutes);
+app.use('/auth', authRoutes);
+app.use('/users',verifyToken, userRoutes);
+app.use('/products',verifyToken, productRoutes);
 
 
 app.get('/', (req,res)=>{
